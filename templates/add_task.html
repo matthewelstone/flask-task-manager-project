@@ -5,7 +5,7 @@
 
 
   <div class="row card-panel grey lighten-5">
-    <form class="col s12" method="POST" action="">
+    <form class="col s12" method="POST" action="{{ url_for('add_task') }}">
       <div class="row">
         <div class="input-field col s12">
             <i class="fas fa-folder-open prefix light-blue-text text-darken-4"></i>
@@ -15,7 +15,7 @@
             <option value="{{ category.category_name }}">{{ category.category_name }}</option>
             {% endfor %}
             </select>
-            <label>category_name</label>
+            <label for="category_name">Task Category</label>
         </div>
       </div>
       <div class="row">
@@ -52,6 +52,13 @@
                   Is Urgent
                 </label>
               </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col s12 center-align">
+              <button type="submit" class="btn-large light-blue darken-1 textshadow">
+                  Add Task <i class="fas fa-plus-square right"></i>
+              </button>
           </div>
       </div>
     </form>
