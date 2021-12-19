@@ -1,7 +1,7 @@
 import os
 from flask import (
     Flask, flash, render_template,
-     redirect, request,session, url_for)
+    redirect, request, session, url_for)
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,7 +30,7 @@ def register():
     if request.method == "POST":
         # check if username already exists in db
         existing_user = mongo.db.users.find_one(
-            {"username":request.form.get("username").lower()})
+            {"username": request.form.get("username").lower()})
 
         if existing_user:
             flash("Username already exists")
@@ -42,7 +42,7 @@ def register():
         }
         mongo.db.users.insert_one(register)
 
-        #put the new user into 'session' cookie
+        # put the new user into 'session' cookie
         session["user"] = request.form.get("username").lower()
         flash("Registration successful")
         return redirect(url_for("profile",username=session["user"]))
@@ -54,7 +54,7 @@ def login():
     if request.method == "POST":
         # check if username exists in db
         existing_user = mongo.db.users.find_one(
-            {"username":request.form.get("username").lower()})
+            {"username": request.form.get("username").lower()})
         
         if existing_user:
             # ensure hashed password matches user input 
@@ -62,8 +62,8 @@ def login():
                 existing_user["password"], request.form.get("password")):
                     session["user"] = request.form.get("username").lower()
                     flash("Welcome, {}".format(request.form.get("username")))
-                    return redirect(url_for(
-                        "profile",username=session["user"]))
+                    return redirect(
+                        url_for("profile", username=session["user"]))
 
             else:
                 # Invalid password match
@@ -79,7 +79,7 @@ def login():
 
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
-    #grab the session users username
+    # grab the session users username
     username = mongo.db.users.find_one(
         {"username": session["user"]})["username"]
 
@@ -124,8 +124,7 @@ def edit_task(task_id):
     if request.method == "POST":
         is_urgent = "on" if request.form.get("is_urgent") else "off"
         tasks = mongo.db.tasks
-        tasks.update_one( {"_id":ObjectId(task_id)},
-        { "$set":{
+        tasks.update_one({"_id": ObjectId(task_id)}, {"$set": {
             "category_name": request.form.get("category_name"),
             "task_name": request.form.get("task_name"),
             "task_description": request.form.get("task_description"),
@@ -147,6 +146,11 @@ def delete_task(task_id):
     flash("Task Successfully Deleted")
     return redirect(url_for("get_tasks"))
 
+
+@app.route("/get_categories")
+def get_categories():
+    categories = list(mongo.db.categories.find().sort("category_name", 1))
+    return render_template("categories.html", categories=categories)
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
